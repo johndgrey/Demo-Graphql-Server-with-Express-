@@ -30,8 +30,8 @@ const ProjectType = new GraphQLObjectType({
     client: { // Beziehung zu Client
       type: ClientType,
       resolve(parent, args) {
-        return Client.findById(parent.clientId); // MongoDB Funkionen 
-        // return clients.find((client) => client.id === parent.clientId); // Werte aus der Datei (sampleDate.js)
+        // return Client.findById(parent.clientId); // MongoDB Funkionen 
+        return clients.find((client) => client.id === parent.clientId); // Werte aus der Datei (sampleDate.js)
       },
     },
   }),
@@ -63,30 +63,30 @@ const RootQuery = new GraphQLObjectType({
         type: ClientType,
         args: {id: {type: GraphQLID}},
         resolve(parent, args) {
-          return Client.findById(args.id);
-            // return clients.find((client) => client.id === args.id);
+          // return Client.findById(args.id); // Mongo
+          return clients.find((client) => client.id === args.id);
         }
     }, 
     clients: {
         type: new GraphQLList(ClientType),
         resolve(parent, args) {
-          return Client.find();
-            // return clients;
+          // return Client.find();
+          return clients;
         }
     },
     projects: {
       type: new GraphQLList(ProjectType), // Ausgabe als Liste vom Typ Projekt
       resolve(parent, args) {
-        return Project.find();
-        // return projects;
+        // return Project.find();
+        return projects;
       },
     },
     project: {
       type: ProjectType,
       args: { id: { type: GraphQLID } },
       resolve(parent, args) { // Rückgabe
-        return Project.findById(args.id);
-        // return projects.find((project) => project.id === args.id);
+        // return Project.findById(args.id);
+        return projects.find((project) => project.id === args.id);
       },
     }
   },
