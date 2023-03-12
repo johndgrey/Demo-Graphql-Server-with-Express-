@@ -4,6 +4,9 @@
 Small experimental demo / to play with Graphql queries and mutations with integration of MongoDB. 
 Alternative locale data holding in the form of JS files.
 
+RUN Demo (development mode) with:
+- npm run dev
+
 **Tools / Frameworks**
 - nodemon (monitor for any changes in nodejs)
 - express
