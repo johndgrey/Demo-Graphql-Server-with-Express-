@@ -6,6 +6,7 @@ Alternative locale data holding in the form of JS files.
 
 RUN Demo (development mode) with:
 - npm run dev
+- Go To GraphiQL: http://localhost:5000/graphql
 
 **Tools / Frameworks**
 - nodemon (monitor for any changes in nodejs)
