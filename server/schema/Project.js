@@ -4,7 +4,7 @@ const Project = require('../models/Project');
 const Client = require('../models/Client');
 
 // Simple Test Data
-const { clients, projects } = require('../sampleData');
+// const { clients, projects } = require('../sampleData');
 
 const {
   GraphQLObjectType,
@@ -19,16 +19,28 @@ const {
 /*
 /* Anfang:  Typ Definitionen 
 */
+
+// Client Type
+const ClientRelationType = new GraphQLObjectType({ // Object Erstellen für GraphQl
+  name: 'ClientRelationType',
+  fields: () => ({
+    id: { type: GraphQLID },
+    name: { type: GraphQLString },
+    email: { type: GraphQLString },
+    phone: { type: GraphQLString },
+  }),
+});
+
 // Project Type
 const ProjectType = new GraphQLObjectType({
-  name: 'Project',
+  name: 'ProjectType',
   fields: () => ({
     id: { type: GraphQLID },
     name: { type: GraphQLString },
     description: { type: GraphQLString },
     status: { type: GraphQLString },
     client: { // Beziehung zu Client
-      type: ClientType,
+      type: ClientRelationType,
       resolve(parent, args) {
         return Client.findById(parent.clientId); // MongoDB Funkionen 
         // return clients.find((client) => client.id === parent.clientId); // Werte aus der Datei (sampleDate.js)
@@ -37,16 +49,6 @@ const ProjectType = new GraphQLObjectType({
   }),
 });
 
-// Client Type
-const ClientType = new GraphQLObjectType({ // Object Erstellen für GraphQl
-  name: 'Client',
-  fields: () => ({
-    id: { type: GraphQLID },
-    name: { type: GraphQLString },
-    email: { type: GraphQLString },
-    phone: { type: GraphQLString },
-  }),
-});
 /*
 /* ENDE:  Typ Definitionen 
 */
@@ -56,29 +58,14 @@ const ClientType = new GraphQLObjectType({ // Object Erstellen für GraphQl
  * Queries / Abfragen
  * 
  */
-const RootQuery = new GraphQLObjectType({
-  name: 'RootQueryType',
+const ProjectRootQuery = new GraphQLObjectType({
+  name: 'ProjectRootQuery',
   fields: {
-    client: {
-        type: ClientType,
-        args: {id: {type: GraphQLID}},
-        resolve(parent, args) {
-          return Client.findById(args.id);
-            // return clients.find((client) => client.id === args.id);
-        }
-    }, 
-    clients: {
-        type: new GraphQLList(ClientType),
-        resolve(parent, args) {
-          return Client.find();
-            // return clients;
-        }
-    },
     projects: {
       type: new GraphQLList(ProjectType), // Ausgabe als Liste vom Typ Projekt
       resolve(parent, args) {
         return Project.find();
-        // return projects;
+        //return projects;
       },
     },
     project: {
@@ -98,44 +85,9 @@ const RootQuery = new GraphQLObjectType({
  * 
  */ 
 
-const mutation = new GraphQLObjectType({
-  name: 'Mutation',
+const ProjectRootMutation = new GraphQLObjectType({
+  name: 'ProjectRootMutation',
   fields: {
-    // Add a client
-    addClient: {
-      type: ClientType,
-      args: {
-        name: { type: new GraphQLNonNull(GraphQLString) },
-        email: { type: GraphQLString }, // are nullable by default
-        phone: { type: GraphQLString }, // are nullable by default
-      },
-      resolve(parent, args) {
-        const client = new Client({
-          name: args.name,
-          email: args.email,
-          phone: args.phone,
-        });
-
-        return client.save();
-      },
-    },
-
-    // Delete a client
-    deleteClient: {
-      type: ClientType,args: {
-        id: { type: new GraphQLNonNull(GraphQLID) },
-      },
-      resolve(parent, args) {
-        Project.find({ clientId: args.id }).then((projects) => {
-          projects.forEach((project) => {
-            project.deleteOne();
-          });
-        });
-
-        return Client.findByIdAndRemove(args.id);
-      },
-    },
-
     // Add a project
     addProject: {
       type: ProjectType,
@@ -215,7 +167,9 @@ const mutation = new GraphQLObjectType({
   },
 });
 
-module.exports = new GraphQLSchema({
-  query: RootQuery,
-  mutation,
-});
+const ProjectSchema = {
+  queries: ProjectRootQuery,
+  mutations: ProjectRootMutation,
+};
+
+module.exports = ProjectSchema
